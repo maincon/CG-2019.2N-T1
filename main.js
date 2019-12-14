@@ -3,7 +3,11 @@ var aspect = window.innerHeight / window.innerWidth
 var width = 15;
 var height = 15;
 var camera = new THREE.OrthographicCamera( - width, width, height, - height, 1, 1000 );
-camera.position.z = 5
+camera.position.z = 5;
+var right = true;
+var left = false;
+var up = false;
+var down = false;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setClearColor("#e5e5e5")
@@ -34,7 +38,7 @@ var end = false;
 var update = function () {
     setTimeout( function() {
         requestAnimationFrame( update );
-    }, 1000 / 1 );
+    }, 1000 / 10 );
 
     var newHead = snakeTrail.shift();
     var oldHead = snakeTrail[snakeTrail.length - 1];
@@ -85,16 +89,28 @@ initialize();
 document.addEventListener("keydown", function(e){
     switch(e.key){
         case "ArrowDown":
-            direction.set(0, -movSpeed);
+            if(!up) direction.set(0, -movSpeed);
+            right = false;
+            left = false;
+            down = true;
         break;
         case "ArrowUp":
-            direction.set(0, movSpeed);
+            if(!down) direction.set(0, movSpeed);
+            right = false;
+            left = false;
+            up = true;
         break;
         case "ArrowLeft":
-            direction.set(-movSpeed, 0);
+            if(!right) direction.set(-movSpeed, 0);
+            up = false;
+            down = false;
+            left = true;
         break;
         case "ArrowRight":
-            direction.set(movSpeed, 0);
+            if(!left) direction.set(movSpeed, 0);
+            up = false;
+            down = false;
+            right = true;
         break;
     }
 });
