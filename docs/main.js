@@ -1,10 +1,10 @@
 var faceDict = {
-    0: "./imagens/bins.png",
-    1: "./imagens/braulio.png",
-    2: "./imagens/denio.png",
-    3: "./imagens/emilio.png",
-    4: "./imagens/fernando.png",
-    5: "./imagens/guilherme.png",
+    0: "./imagens/Bins.png",
+    1: "./imagens/Braulio.png",
+    2: "./imagens/Denio.png",
+    3: "./imagens/Emilio.png",
+    4: "./imagens/Fernando.png",
+    5: "./imagens/Guilherme.png",
     6: "./imagens/mar.png"
 }
 
