@@ -1,3 +1,13 @@
+var faceDict = {
+    0: "/Skins/Bins.png",
+    1: "/Skins/Braulio.png",
+    2: "/Skins/Denio.png",
+    3: "/Skins/Emilio.png",
+    4: "/Skins/Fernando.png",
+    5: "/Skins/Guilherme.png",
+    6: "/Skins/Marco.png"
+}
+
 var scene = new THREE.Scene();
 var aspect = window.innerHeight / window.innerWidth
 var width = 16;
@@ -24,10 +34,6 @@ var light = new THREE.PointLight(0xFFFFFF, 1, 500)
 light.position.set(10, 0, 25)
 scene.add(light);
 
-var fernando_face_url = "/Skins/fernando_face.png"
-var geometry = new THREE.PlaneBufferGeometry(1, 1);
-var texture = new THREE.TextureLoader().load(fernando_face_url);
-var material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
 var movSpeed = 1;
 var direction = new THREE.Vector2(movSpeed, 0);
 
@@ -35,16 +41,34 @@ var snakeTrail = [];
 var tailLength = 5;
 var end = false;
 
-function randomPlace(value){
+var randomPlace = function (value){
     return Math.floor(Math.random()*value) * (Math.floor(Math.random()*2) == 1 ? 1 : -1);
 }
 
-var generateProfessor = function (x, y) {
-    mesh = new THREE.Mesh(geometry, material);
+var generateProfessor = function (x, y, professor) {
+    let geometry = new THREE.PlaneBufferGeometry(1, 1);
+    let texture = new THREE.TextureLoader().load(faceDict[professor]);
+    let material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
+    let mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = x;
     mesh.position.y = y;
     mesh.rotation.z = Math.PI;
     return mesh;
+}
+
+var randomProfessor = function () {
+    return Math.floor(Math.random()*Object.keys(faceDict).length);
+}
+
+var reset = function () {
+    while(snakeTrail.length > 5) {
+        scene.remove(snakeTrail.shift());
+    }
+    for(i = 0; i < snakeTrail.length; i ++){
+        snakeTrail[i].position.x = 0 - i;
+        snakeTrail[i].position.y = 0;
+    }
+    end = false;   
 }
 
 var update = function () {
@@ -52,31 +76,34 @@ var update = function () {
         requestAnimationFrame( update );
     }, 1000 / 10 );
 
-    console.log(snakeTrail);
-    var newHead = snakeTrail.shift();
     var oldHead = snakeTrail[snakeTrail.length - 1];
+    var newHead = snakeTrail.shift();
+    oldHead.material.map = newHead.material.map
+    oldHead.material.needsUpdate = true;
+    newHead.material.map = headTexture;
+    newHead.material.needsUpdate = true;
 
     newHead.position.x = oldHead.position.x + direction.x;
     newHead.position.y = oldHead.position.y + direction.y;
     
     snakeTrail.push(newHead);
-
-    // for(var i = snakeTrail.length - 2; i > -1; i--){
-    //     console.log(newHead.position.distanceTo(snakeTrail[i].position));
-    //     if(newHead.position.distanceTo(snakeTrail[i].position) < 1){
-    //         end = true;
-    //         break;
-    //     }
-    // }
-    // if(end){
-    //     console.log('Nani');
-    // }
+    for(i = snakeTrail.length - 2; i > -1; i--){
+        if(newHead.position.distanceTo(snakeTrail[i].position) < 1){
+            end = true;
+            break;
+        }
+    }
+    if (end) {
+        reset();
+    }
     if (newHead.position.distanceTo(appleProfessor.position) < 1){
-        newTail = generateProfessor(snakeTrail[0].x + direction.x, snakeTrail[0].y + direction.y);
+        newTail = generateProfessor(snakeTrail[0].x + direction.x, snakeTrail[0].y + direction.y, appleId);
         scene.add(newTail)
         snakeTrail.unshift(newTail);
-        appleProfessor.position.x = randomPlace(width);
-        appleProfessor.position.y = randomPlace(height);
+        appleId = randomProfessor();
+        scene.remove(appleProfessor);
+        appleProfessor = generateProfessor(randomPlace(width), randomPlace(height), appleId);
+        scene.add(appleProfessor);
     }
     if (newHead.position.x <= -width-1){
         newHead.position.x = width;
@@ -91,14 +118,16 @@ var update = function () {
     renderer.render( scene, camera );
 };
 
-var appleProfessor = generateProfessor(randomPlace(width), randomPlace(height));
+var appleId = randomProfessor()
+var appleProfessor = generateProfessor(randomPlace(width), randomPlace(height), appleId);
+var headTexture = new THREE.TextureLoader().load(faceDict[4]);
 scene.add(appleProfessor);
 var initialize = function (){
-
     for(i = 0; i < tailLength; i++){
-        professor = generateProfessor(0 - i, 0);
+        console.log(i)
+        professor = generateProfessor(0 - i, 0, randomProfessor());
         professor.rotation.z = Math.PI;
-        snakeTrail.push(professor);
+        snakeTrail.unshift(professor);
         scene.add(professor)
     }
     update();
@@ -111,27 +140,27 @@ document.addEventListener("keydown", function(e){
     switch(e.key){
         case "ArrowDown":
             if(!up) direction.set(0, -movSpeed);
+            down = true;
             right = false;
             left = false;
-            down = true;
         break;
         case "ArrowUp":
             if(!down) direction.set(0, movSpeed);
+            up = true;
             right = false;
             left = false;
-            up = true;
         break;
         case "ArrowLeft":
             if(!right) direction.set(-movSpeed, 0);
+            left = true;
             up = false;
             down = false;
-            left = true;
         break;
         case "ArrowRight":
             if(!left) direction.set(movSpeed, 0);
+            right = true;
             up = false;
             down = false;
-            right = true;
         break;
     }
 });
