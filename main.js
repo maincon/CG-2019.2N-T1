@@ -14,10 +14,6 @@ var width = 16;
 var height = 9;
 var camera = new THREE.OrthographicCamera( - width, width, height, - height, 1, 1000 );
 camera.position.z = 5;
-var right = true;
-var left = false;
-var up = false;
-var down = false;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(0xE5E5E5)
@@ -124,7 +120,6 @@ var headTexture = new THREE.TextureLoader().load(faceDict[4]);
 scene.add(appleProfessor);
 var initialize = function (){
     for(i = 0; i < tailLength; i++){
-        console.log(i)
         professor = generateProfessor(0 - i, 0, randomProfessor());
         professor.rotation.z = Math.PI;
         snakeTrail.unshift(professor);
@@ -135,32 +130,19 @@ var initialize = function (){
 
 initialize();
 
-
 document.addEventListener("keydown", function(e){
     switch(e.key){
         case "ArrowDown":
-            if(!up) direction.set(0, -movSpeed);
-            down = true;
-            right = false;
-            left = false;
+            if(!direction.y) direction.set(0, -movSpeed);
         break;
         case "ArrowUp":
-            if(!down) direction.set(0, movSpeed);
-            up = true;
-            right = false;
-            left = false;
+            if(!direction.y) direction.set(0, movSpeed);
         break;
         case "ArrowLeft":
-            if(!right) direction.set(-movSpeed, 0);
-            left = true;
-            up = false;
-            down = false;
+            if(!direction.x) direction.set(-movSpeed, 0);
         break;
         case "ArrowRight":
-            if(!left) direction.set(movSpeed, 0);
-            right = true;
-            up = false;
-            down = false;
+            if(!direction.x) direction.set(movSpeed, 0);
         break;
     }
 });
