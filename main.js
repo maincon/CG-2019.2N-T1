@@ -24,14 +24,50 @@ var fernando_face_url = "fernando_face.png"
 var geometry = new THREE.PlaneBufferGeometry(1, 1);
 var texture = new THREE.TextureLoader().load(fernando_face_url);
 var material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
-var snakeHead = new THREE.Mesh( geometry, material );
-var movSpeed = 0.2
-var direction = new THREE.Vector2(0, 0);
+var movSpeed = 1;
+var direction = new THREE.Vector2(movSpeed, 0);
 
-scene.add(snakeHead)
+var snakeTrail = [];
+var tailLength = 5;
+var end = false;
 
-var snakeTrail = []
-var tailLength = 5
+var update = function () {
+    setTimeout( function() {
+        requestAnimationFrame( update );
+    }, 1000 / 1 );
+
+    var newHead = snakeTrail.shift();
+    var oldHead = snakeTrail[snakeTrail.length - 1];
+
+    newHead.position.x = oldHead.position.x + direction.x;
+    newHead.position.y = oldHead.position.y + direction.y;
+    
+    snakeTrail.push(newHead);
+
+    for(var i = snakeTrail.length - 2; i > -1; i--){
+        console.log(newHead.position.distanceTo(snakeTrail[i].position));
+        if(newHead.position.distanceTo(snakeTrail[i].position) < 1){
+            end = true;
+            break;
+        }
+    }
+    if(end){
+        console.log('Nani')
+    }
+
+    if (newHead.position.x <= -width){
+        newHead.position.x = width;
+    } else if (newHead.position.x >= width){
+        newHead.position.x = -width;
+    } else if (newHead.position.y <= -height){
+        newHead.position.y = height;
+    } else if (newHead.position.y >= height){
+        newHead.position.y = -height;
+    }
+
+
+    renderer.render( scene, camera );
+};
 
 var initialize = function (){
     for(i = 0; i < tailLength; i++){
@@ -40,30 +76,11 @@ var initialize = function (){
         snakeTrail.push(mesh);
         scene.add(mesh)
     }
+    update();
 }
 
-// initialize();
+initialize();
 
-var update = function () {
-    requestAnimationFrame( update );
-
-    if (snakeHead.position.x <= -width){
-        snakeHead.position.x = width;
-    } else if (snakeHead.position.x >= width){
-        snakeHead.position.x = -width;
-    } else if (snakeHead.position.y <= -height){
-        snakeHead.position.y = height;
-    } else if (snakeHead.position.y >= height){
-        snakeHead.position.y = -height;
-    }
-
-    snakeHead.position.x = snakeHead.position.x + direction.x
-    snakeHead.position.y = snakeHead.position.y + direction.y
-
-    renderer.render( scene, camera );
-};
-
-update();
 
 document.addEventListener("keydown", function(e){
     switch(e.key){
