@@ -1,7 +1,7 @@
 var scene = new THREE.Scene();
 var aspect = window.innerHeight / window.innerWidth
-var width = 15;
-var height = 15;
+var width = 16;
+var height = 9;
 var camera = new THREE.OrthographicCamera( - width, width, height, - height, 1, 1000 );
 camera.position.z = 5;
 var right = true;
@@ -10,7 +10,7 @@ var up = false;
 var down = false;
 
 var renderer = new THREE.WebGLRenderer();
-renderer.setClearColor("#e5e5e5")
+renderer.setClearColor(0xE5E5E5)
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
@@ -24,7 +24,7 @@ var light = new THREE.PointLight(0xFFFFFF, 1, 500)
 light.position.set(10, 0, 25)
 scene.add(light);
 
-var fernando_face_url = "fernando_face.png"
+var fernando_face_url = "/Skins/fernando_face.png"
 var geometry = new THREE.PlaneBufferGeometry(1, 1);
 var texture = new THREE.TextureLoader().load(fernando_face_url);
 var material = new THREE.MeshBasicMaterial({map: texture, transparent: true, side: THREE.DoubleSide});
@@ -35,11 +35,24 @@ var snakeTrail = [];
 var tailLength = 5;
 var end = false;
 
+function randomPlace(value){
+    return Math.floor(Math.random()*value) * (Math.floor(Math.random()*2) == 1 ? 1 : -1);
+}
+
+var generateProfessor = function (x, y) {
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.x = x;
+    mesh.position.y = y;
+    mesh.rotation.z = Math.PI;
+    return mesh;
+}
+
 var update = function () {
     setTimeout( function() {
         requestAnimationFrame( update );
     }, 1000 / 10 );
 
+    console.log(snakeTrail);
     var newHead = snakeTrail.shift();
     var oldHead = snakeTrail[snakeTrail.length - 1];
 
@@ -48,37 +61,45 @@ var update = function () {
     
     snakeTrail.push(newHead);
 
-    for(var i = snakeTrail.length - 2; i > -1; i--){
-        console.log(newHead.position.distanceTo(snakeTrail[i].position));
-        if(newHead.position.distanceTo(snakeTrail[i].position) < 1){
-            end = true;
-            break;
-        }
+    // for(var i = snakeTrail.length - 2; i > -1; i--){
+    //     console.log(newHead.position.distanceTo(snakeTrail[i].position));
+    //     if(newHead.position.distanceTo(snakeTrail[i].position) < 1){
+    //         end = true;
+    //         break;
+    //     }
+    // }
+    // if(end){
+    //     console.log('Nani');
+    // }
+    if (newHead.position.distanceTo(appleProfessor.position) < 1){
+        newTail = generateProfessor(snakeTrail[0].x + direction.x, snakeTrail[0].y + direction.y);
+        scene.add(newTail)
+        snakeTrail.unshift(newTail);
+        appleProfessor.position.x = randomPlace(width);
+        appleProfessor.position.y = randomPlace(height);
     }
-    if(end){
-        console.log('Nani')
-    }
-
-    if (newHead.position.x <= -width){
+    if (newHead.position.x <= -width-1){
         newHead.position.x = width;
-    } else if (newHead.position.x >= width){
+    } else if (newHead.position.x >= width+1){
         newHead.position.x = -width;
-    } else if (newHead.position.y <= -height){
+    } else if (newHead.position.y <= -height-1){
         newHead.position.y = height;
-    } else if (newHead.position.y >= height){
+    } else if (newHead.position.y >= height+1){
         newHead.position.y = -height;
     }
-
 
     renderer.render( scene, camera );
 };
 
+var appleProfessor = generateProfessor(randomPlace(width), randomPlace(height));
+scene.add(appleProfessor);
 var initialize = function (){
+
     for(i = 0; i < tailLength; i++){
-        mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x -= i * 1
-        snakeTrail.push(mesh);
-        scene.add(mesh)
+        professor = generateProfessor(0 - i, 0);
+        professor.rotation.z = Math.PI;
+        snakeTrail.push(professor);
+        scene.add(professor)
     }
     update();
 }
