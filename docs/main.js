@@ -1,11 +1,11 @@
 var faceDict = {
-    0: "./Skins/Bins.png",
-    1: "./Skins/Braulio.png",
-    2: "./Skins/Denio.png",
-    3: "./Skins/Emilio.png",
-    4: "./Skins/Fernando.png",
-    5: "./Skins/Guilherme.png",
-    6: "./Skins/Marco.png"
+    0: "./imagens/Bins.png",
+    1: "./imagens/Braulio.png",
+    2: "./imagens/Denio.png",
+    3: "./imagens/Emilio.png",
+    4: "./imagens/Fernando.png",
+    5: "./imagens/Guilherme.png",
+    6: "./imagens/Marco.png"
 }
 
 var scene = new THREE.Scene();
