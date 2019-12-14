@@ -5,7 +5,7 @@ var faceDict = {
     3: "./imagens/emilio.png",
     4: "./imagens/fernando.png",
     5: "./imagens/guilherme.png",
-    6: "./imagens/marco.png"
+    6: "./imagens/mar.png"
 }
 
 var scene = new THREE.Scene();
